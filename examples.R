@@ -1,5 +1,15 @@
-library(ggvoronoi) #also loads dplyr, ggplot2, sp, deldir
+library(sp)
+library(deldir)
+library(raster)
+library(rgeos)
 library(tidyverse)
+
+#setwd("C:/Users/garretrc/voronoi_dev")
+
+source("geom_voronoi.R")
+source("stat_voronoi.R")
+source("StatVoronoi.R")
+source("voronoi_polygon.R")
 
 #start with some simulated data and drawing the path only
 x=sample(1:100,50)
