@@ -20,12 +20,21 @@ voronoi_polygon = function(x, y, fill = NULL, outline = NULL)
       outline_spdf = SpatialPolygonsDataFrame(SpatialPolygons(outline_polygons), 
                                               data = data.frame(group = unique(outline$group),
                                                                 row.names = unique(outline$group)))
+    }else if(class(outline) == "SpatialPolygonsDataFrame"){
+      outline_spdf = outline
     }
+  }
+  if(!is.null(outline)){
+    extent = extent(outline_spdf) 
+    rw = c(extent@xmin, extent@xmax, extent@ymin, extent@ymax)
+  }else{
+    rw = NULL
   }
   data = data.frame(x, y)
   data$fill = fill
   pts = SpatialPointsDataFrame(cbind(x, y), data, match.ID = T)
-  vor_desc = tile.list(deldir(pts@coords[, 1], pts@coords[, 2]))
+  vor_desc = tile.list(deldir(pts@coords[, 1], pts@coords[, 2], 
+                              rw = rw))
   vor_polygons <- lapply(1:(length(vor_desc)), function(i) {
     tmp <- cbind(vor_desc[[i]]$x, vor_desc[[i]]$y)
     tmp <- rbind(tmp, tmp[1, ])
