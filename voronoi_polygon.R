@@ -45,7 +45,7 @@ voronoi_polygon = function(x, y, fill = NULL, outline = NULL)
   vor_spdf = SpatialPolygonsDataFrame(SpatialPolygons(vor_polygons), 
                                       data = pts@data)
   if(!is.null(outline)){
-    vor_spdf = intersect(gBuffer(vor_spdf, byid=TRUE, width=0), gBuffer(outline_spdf, byid=TRUE, width=0))
+    vor_spdf = rgeos::intersect(gBuffer(vor_spdf, byid=TRUE, width=0), gBuffer(outline_spdf, byid=TRUE, width=0))
   }
   
   voronoi = suppressMessages(ggplot2::fortify(vor_spdf)) 
