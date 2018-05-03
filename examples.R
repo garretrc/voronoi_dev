@@ -53,6 +53,7 @@ ggplot(points)+
   
 ####North America Example####
 
+#This example will be using multiple maps, and is a bit more complicated!
 us_cont = map_data(map = "usa")
 alaska = map_data("world", "usa") %>% filter(subregion == "Alaska")
 hawaii = map_data("world", "usa") %>% filter(subregion == "Hawaii")
@@ -66,8 +67,15 @@ outlines = outlines %>%
 
 cities = world.cities %>% filter(country.etc %in% c('USA', 'Mexico', 'Canada') & pop > 100000)
 
-ggplot(cities, aes(long, lat, fill = log(pop))) + 
-  geom_voronoi(outline = outlines) 
+ggplot() + 
+  geom_voronoi(data=cities, 
+               aes(long, lat, fill = log(pop)),
+               outline = outlines)+
+  scale_fill_gradient(high="darkgreen",low="gray90")+
+  geom_path(data=outlines, 
+            aes(x=long,y=lat,group=group))+
+  theme_minimal()+
+  coord_map(projection = "gilbert")
 
 
 ####To be finished####
