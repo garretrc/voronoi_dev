@@ -3,6 +3,8 @@ voronoi_polygon_2 = function(data, mapping = aes(x, y), outline = NULL)
   if(class(data) != "data.frame"){
     stop('"Data" must be of class data.frame')
   }
+  x = data[,paste(mapping$x)]
+  y = data[,paste(mapping$y)]
   if(!is.null(outline)){
     if(class(outline) != "data.frame" & class(outline) != "SpatialPolygonsDataFrame"){
       outline = NULL
@@ -29,12 +31,13 @@ voronoi_polygon_2 = function(data, mapping = aes(x, y), outline = NULL)
   }
   if(!is.null(outline)){
     extent = extent(outline_spdf) 
-    rw = c(extent@xmin, extent@xmax, extent@ymin, extent@ymax)
+    rw = c(min(extent@xmin, min(x)), 
+           max(extent@xmax, max(x)),
+           min(extent@ymin, min(y)),
+           max(extent@ymax, max(y)))
   }else{
     rw = NULL
   }
-  x = data[,paste(mapping$x)]
-  y = data[,paste(mapping$y)]
   pts = SpatialPointsDataFrame(cbind(x, y), data, match.ID = T)
   vor_desc = tile.list(deldir(pts@coords[, 1], pts@coords[, 2], 
                               rw = rw))
@@ -51,7 +54,7 @@ voronoi_polygon_2 = function(data, mapping = aes(x, y), outline = NULL)
     vor_spdf = rgeos::intersect(gBuffer(vor_spdf, byid=TRUE, width=0), gBuffer(outline_spdf, byid=TRUE, width=0))
   }
   
-  voronoi = suppressMessages(ggplot2::fortify(vor_spdf)) 
+  voronoi = suppressMessages(ggplot2::fortify(vor_spdf, data)) 
   
   names(voronoi)[1:2] = c(paste(mapping$x), paste(mapping$y))
   
