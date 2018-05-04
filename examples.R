@@ -1,45 +1,84 @@
+library(ggplot2)
+library(dplyr)
 library(sp)
+library(rgeos)
 library(deldir)
 library(raster)
-library(rgeos)
-library(tidyverse)
 
 #setwd("C:/Users/garretrc/voronoi_dev")
 
-source("geom_voronoi.R")
-source("stat_voronoi.R")
-source("StatVoronoi.R")
-source("voronoi_polygon.R")
+source('voronoi_polygon.R')
+source('stat_voronoi.R')
+source('StatVoronoi.R')
+source('geom_voronoi.R')
 
+####Circles####
 #start with some simulated data and drawing the path only
 x=sample(1:100,50)
 y=sample(1:100,50)
+fill = sqrt((x-50)^2 + (y-50)^2) #distance form the center
+points = data.frame(x=x,y=y,fill=fill)
 
-?voronoi_path
-ggplot()+voronoi_path(x,y)
+#We can draw only the paths
+ggplot(points)+
+  geom_voronoi(aes(x,y),fill=NA,color="black")+
+  theme_minimal()
 
-#now add a simple fill component and turn these into polygons!
-?voronoi_polygon
-ggplot()+voronoi_polygon(x=x,y=y,fill=1:50)
+#or add in a fill variable!
+ggplot(points)+
+  geom_voronoi(aes(x,y,fill=fill))+
+  theme_minimal()
 
-#sweet! of course we can get fancy with this since we're using ggplot2
-#base fill on distance from the center
-fill = sqrt((x-50)^2 + (y-50)^2)
-
-ggplot()+
-  voronoi_polygon(x,y,fill=fill)+
-  scale_fill_gradient(low="white",high="red")+
-  geom_point(aes(x,y),alpha=.2)
-
-#and now finally we can restrict the area where the voronoi diagram is drawn with the outline argument
+#but most of the time we don't want a square, we want a predefined region.
+#the outline argument can take any dataframe with the following structure:
+#first column is x/longitude
+#second column is y/latitude
+#optional column "group"
+#Or you can feed it any spatial polygons dataframe!
 
 circle = data.frame(x = 50*(1+cos(seq(0, 2*pi, length.out = 1000))), 
-                    y = 50*(1+sin(seq(0, 2*pi, length.out = 1000))))
+                    y = 50*(1+sin(seq(0, 2*pi, length.out = 1000))),
+                    group=rep(1,1000))
 
-ggplot()+
-  voronoi_polygon(x,y,fill=fill,outline=circle)+
-  scale_fill_gradient(low="white",high="red")
+ggplot(data=points, aes(x=x, y=y, fill=fill)) + 
+  geom_voronoi(outline = circle)+
+  theme_minimal()
 
+#And with more knowlege of ggplot we can add more:
+ggplot(points)+
+  geom_voronoi(aes(x=x,y=y,fill=fill),outline=circle)+
+  scale_fill_gradient(low="white",high="darkred",guide=F)+
+  geom_point(aes(x,y))+
+  theme_minimal()
+  
+####North America Example####
+
+#This example will be using multiple maps, and is a bit more complicated!
+us_cont = map_data(map = "usa")
+alaska = map_data("world", "usa") %>% filter(subregion == "Alaska")
+hawaii = map_data("world", "usa") %>% filter(subregion == "Hawaii")
+mexico = map_data("world", "mexico")
+canada = map_data("world", "canada")
+
+outlines = rbind(us_cont, alaska, hawaii, mexico, canada)
+outlines = outlines %>% 
+  mutate(group = paste(region, subregion, group, sep = '.')) %>% # Need 'group' variable to be a unique variable now, wasn't from rbinding multiple together
+  filter(long < 100) # Just to ignore that little Alaskan island that is on other side of 180/-180 line
+
+cities = world.cities %>% filter(country.etc %in% c('USA', 'Mexico', 'Canada') & pop > 100000)
+
+ggplot() + 
+  geom_voronoi(data=cities, 
+               aes(long, lat, fill = log(pop)),
+               outline = outlines)+
+  scale_fill_gradient(high="darkgreen",low="gray90")+
+  geom_path(data=outlines, 
+            aes(x=long,y=lat,group=group))+
+  theme_minimal()+
+  coord_map(projection = "gilbert")
+
+
+####To be finished####
 
 #Now for an actual use case, maps!
 
