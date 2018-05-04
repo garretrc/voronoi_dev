@@ -1,10 +1,12 @@
-voronoi_polygon_2 = function(data, mapping = aes(x, y), outline = NULL) 
+voronoi_polygon_2 = function(data, x = 'x', y = 'y', outline = NULL) 
 {
   if(class(data) != "data.frame"){
     stop('"Data" must be of class data.frame')
   }
-  x = data[,paste(mapping$x)]
-  y = data[,paste(mapping$y)]
+  xname = x
+  yname = y
+  x = data[,x]
+  y = data[,y]
   if(!is.null(outline)){
     if(class(outline) != "data.frame" & class(outline) != "SpatialPolygonsDataFrame"){
       outline = NULL
@@ -56,7 +58,7 @@ voronoi_polygon_2 = function(data, mapping = aes(x, y), outline = NULL)
   
   voronoi = suppressMessages(ggplot2::fortify(vor_spdf, data)) 
   
-  names(voronoi)[1:2] = c(paste(mapping$x), paste(mapping$y))
+  names(voronoi)[1:2] = names(data[,c(xname, yname)])
   
   for(name in names(data)){
     if(!(name %in% names(voronoi))){
