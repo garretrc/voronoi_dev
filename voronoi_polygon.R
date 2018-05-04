@@ -26,7 +26,10 @@ voronoi_polygon = function(x, y, fill = NULL, outline = NULL)
   }
   if(!is.null(outline)){
     extent = extent(outline_spdf) 
-    rw = c(extent@xmin, extent@xmax, extent@ymin, extent@ymax)
+    rw = c(min(extent@xmin, min(x)), 
+           max(extent@xmax, max(x)),
+           min(extent@ymin, min(y)),
+           max(extent@ymax, max(y)))
   }else{
     rw = NULL
   }
