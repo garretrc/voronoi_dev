@@ -8,6 +8,9 @@ voronoi_polygon_2 = function(data, x = 'x', y = 'y', outline = NULL)
   x = data[,x]
   y = data[,y]
   if(!is.null(outline)){
+    if(class(outline)=="SpatialPolygons"){
+      outline = SpatialPolygonsDataFrame(outline,data.frame(rep(NA,length(hull))))
+    }
     if(class(outline) != "data.frame" & class(outline) != "SpatialPolygonsDataFrame"){
       outline = NULL
       warning("Outline must be of class data.frame or SpatialPolygonsDataFrame. No outline will be used.")
