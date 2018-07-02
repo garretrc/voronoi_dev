@@ -1,4 +1,4 @@
-voronoi_polygon_2 = function(data, x = 'x', y = 'y', outline = NULL) 
+voronoi_polygon_2 = function(data, x = 'x', y = 'y', outline = NULL, data.frame=FALSE) 
 {
   if(class(data) != "data.frame"){
     stop('"Data" must be of class data.frame')
@@ -59,6 +59,10 @@ voronoi_polygon_2 = function(data, x = 'x', y = 'y', outline = NULL)
     vor_spdf = rgeos::intersect(gBuffer(vor_spdf, byid=TRUE, width=0), gBuffer(outline_spdf, byid=TRUE, width=0))
   }
   
+  if(data.frame==FALSE){
+    return(vor_spdf)
+  }else{
+  
   voronoi = suppressMessages(ggplot2::fortify(vor_spdf, data)) 
   
   names(voronoi)[1:2] = names(data[,c(xname, yname)])
@@ -74,4 +78,5 @@ voronoi_polygon_2 = function(data, x = 'x', y = 'y', outline = NULL)
   }
   
   return(voronoi)
+  }
 }
