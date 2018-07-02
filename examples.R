@@ -55,17 +55,14 @@ ggplot(points)+
 
 #This example will be using multiple maps, and is a bit more complicated!
 us_cont = map_data(map = "usa")
-alaska = map_data("world", "usa") %>% filter(subregion == "Alaska")
-hawaii = map_data("world", "usa") %>% filter(subregion == "Hawaii")
 mexico = map_data("world", "mexico")
-canada = map_data("world", "canada")
 
-outlines = rbind(us_cont, alaska, hawaii, mexico, canada)
+outlines = rbind(us_cont, mexico)
 outlines = outlines %>% 
   mutate(group = paste(region, subregion, group, sep = '.')) %>% # Need 'group' variable to be a unique variable now, wasn't from rbinding multiple together
   filter(long < 100) # Just to ignore that little Alaskan island that is on other side of 180/-180 line
 
-cities = world.cities %>% filter(country.etc %in% c('USA', 'Mexico', 'Canada') & pop > 100000)
+cities = world.cities %>% filter(country.etc %in% c('USA', 'Mexico') & pop > 100000)
 
 ggplot() + 
   geom_voronoi(data=cities, 
