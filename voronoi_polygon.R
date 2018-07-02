@@ -45,7 +45,7 @@ voronoi_polygon = function(data, x = 'x', y = 'y', outline = NULL, data.frame=FA
   }
   pts = SpatialPointsDataFrame(cbind(x, y), data, match.ID = T)
   vor_desc = tile.list(deldir(pts@coords[, 1], pts@coords[, 2], 
-                              rw = rw))
+                              rw = rw,suppressMsge = TRUE))
   vor_polygons <- lapply(1:(length(vor_desc)), function(i) {
     tmp <- cbind(vor_desc[[i]]$x, vor_desc[[i]]$y)
     tmp <- rbind(tmp, tmp[1, ])
