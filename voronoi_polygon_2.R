@@ -1,4 +1,4 @@
-voronoi_polygon_2 = function(data, x = 'x', y = 'y', outline = NULL, data.frame=FALSE) 
+voronoi_polygon = function(data, x = 'x', y = 'y', outline = NULL, data.frame=FALSE) 
 {
   if(class(data) != "data.frame"){
     stop('"Data" must be of class data.frame')
